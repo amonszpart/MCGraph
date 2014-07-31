@@ -92,6 +92,8 @@ d3.json(json_path, function(json, error) {
     json.nodes.forEach(function(item, index) {
         // store node index under it's name in the map
         tmp_nodes[item.name] = index;
+        if (item.x) item.x *= w;
+        if (item.y) item.y *= h;
     });
     // change link source and target fields to use these ids instead of string keys
     json.links.forEach(function(item) {
