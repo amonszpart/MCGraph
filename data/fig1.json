@@ -8,14 +8,29 @@
     }, {
         "name": "Support",
         "type": "sub-knowledge graph"
+    }, {
+        "name": "Semantic",
+        "type": "sub-knowledge graph"
+    }, {
+        "name": "Stand on",
+        "group": "semantic",
+        "type": "node"
     }],
     "links": [{
         "source": "Knowledge graph",
         "target": "3D Proxy",
-        "type": ""
+        "type": "member"
     }, {
         "source": "Knowledge graph",
         "target": "Support",
-        "type": ""
+        "type": "member"
+    }, {
+        "source": "Knowledge graph",
+        "target": "Semantic",
+        "type": "member"
+    }, {
+        "source": "Support",
+        "target": "Stand on",
+        "type": "member"
     }]
 }
