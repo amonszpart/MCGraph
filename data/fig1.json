@@ -1,7 +1,10 @@
 {
     "nodes": [{
         "name": "Knowledge graph",
-        "type": "root"
+        "type": "root",
+        "fixed": true,
+        "y": 0.1,
+        "x": 0.5
     }, {
         "name": "3D Proxy",
         "type": "sub-knowledge graph"
@@ -13,7 +16,55 @@
         "type": "sub-knowledge graph"
     }, {
         "name": "Stand on",
-        "group": "semantic",
+        "group": "Support",
+        "type": "node"
+    }, {
+        "name": "Touch",
+        "group": "Support",
+        "type": "node"
+    }, {
+        "name": "Fixed on",
+        "group": "Support",
+        "type": "node"
+    }, {
+        "name": "Plane",
+        "group": "3D Proxy",
+        "type": "node"
+    }, {
+        "name": "Cuboid",
+        "group": "3D Proxy",
+        "type": "node"
+    }, {
+        "name": "Sphere",
+        "group": "3D Proxy",
+        "type": "node"
+    }, {
+        "name": "Furniture",
+        "group": "Semantic",
+        "type": "node"
+    }, {
+        "name": "Decoration",
+        "group": "Semantic",
+        "type": "node"
+    }, {
+        "name": "Electronic",
+        "group": "Semantic",
+        "type": "node"
+    }, {
+        "name": "Sofa",
+        "group": "Semantic",
+        "type": "node"
+    }, {
+        "name": "TV bench",
+        "group": "Semantic",
+        "type": "node"
+    }, {
+        "name": "TV",
+        "group": "Semantic",
+        "type": "node"
+    }, {
+        "name": "Phone",
+        "group": "Semantic",
         "type": "node"
     }],
     "links": [{
@@ -31,6 +82,54 @@
     }, {
         "source": "Support",
         "target": "Stand on",
+        "type": "member"
+    }, {
+        "source": "Support",
+        "target": "Touch",
+        "type": "member"
+    }, {
+        "source": "Support",
+        "target": "Fixed on",
+        "type": "member"
+    }, {
+        "source": "3D Proxy",
+        "target": "Plane",
+        "type": "member"
+    }, {
+        "source": "3D Proxy",
+        "target": "Cuboid",
+        "type": "member"
+    }, {
+        "source": "3D Proxy",
+        "target": "Sphere",
+        "type": "member"
+    }, {
+        "source": "Semantic",
+        "target": "Furniture",
+        "type": "member"
+    }, {
+        "source": "Semantic",
+        "target": "Decoration",
+        "type": "member"
+    }, {
+        "source": "Semantic",
+        "target": "Electronic",
+        "type": "member"
+    }, {
+        "source": "Furniture",
+        "target": "Sofa",
+        "type": "member"
+    }, {
+        "source": "Furniture",
+        "target": "TV bench",
+        "type": "member"
+    }, {
+        "source": "Electronic",
+        "target": "TV",
+        "type": "member"
+    }, {
+        "source": "Electronic",
+        "target": "Phone",
         "type": "member"
     }]
 }
