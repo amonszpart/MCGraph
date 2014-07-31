@@ -170,7 +170,8 @@ d3.json(json_path, function(json, error) {
         .style("fill", "#000")
         .style("font-family", "Arial")
         .text(function(d) {
-            return d.type;
+            if (d.label) return d.label;
+            else return "";
         });
 
     // force.nodes( d3.values(nodes) )
