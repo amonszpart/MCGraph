@@ -1,0 +1,21 @@
+{
+    "nodes": [{
+        "name": "Knowledge graph",
+        "type": "root"
+    }, {
+        "name": "3D Proxy",
+        "type": "sub-knowledge graph"
+    }, {
+        "name": "Support",
+        "type": "sub-knowledge graph"
+    }],
+    "links": [{
+        "source": "Knowledge graph",
+        "target": "3D Proxy",
+        "type": ""
+    }, {
+        "source": "Knowledge graph",
+        "target": "Support",
+        "type": ""
+    }]
+}
