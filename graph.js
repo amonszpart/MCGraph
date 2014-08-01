@@ -8,6 +8,9 @@
 // scene size
 var w = 1024,
     h = 760;
+var KN_RECT_W = 50,
+    KN_RECT_H = 16,
+    AB_CIRCLE_R = 8;
 
 // predeclare globals
 var link = {},
@@ -107,11 +110,11 @@ d3.json(json_path, function(json, error) {
         // add RECT for all knowledge nodes
         svg.selectAll("g.node")
             .filter(function(d) {
-                return (d.name.indexOf("abstr_") === -1) && ((d.type === "sub-knowledge graph") || (d.type === "node") || (d.type === "root"));
+                return filterKnowledge(d);
             })
             .append("svg:rect")
-            .attr("width", 30)
-            .attr("height", 20)
+            .attr("width", KN_RECT_W)
+            .attr("height", KN_RECT_H)
             .style("stroke", function(d) {
                 if (d.color) return d.color;
                 else return "#3c64a0";
@@ -123,7 +126,8 @@ d3.json(json_path, function(json, error) {
         // add CIRCLE to abstraction NODEs
         svg.selectAll("g.node").filter(function(d) {
             return (d.name.indexOf("abstr_") > -1) && (d.type === "node");
-        }).append("svg:circle").attr("r", 8)
+        }).append("svg:circle")
+            .attr("r", AB_CIRCLE_R)
             .style("fill", function(d) {
                 if (d.color) return d.color;
                 else return "#FF0000";
@@ -144,22 +148,50 @@ d3.json(json_path, function(json, error) {
                 return "#FFFFFF";
             });
 
+        // general text placeholders
         text = svg.append("svg:g").selectAll("g")
             .data(force.nodes())
             .enter().append("svg:g");
 
-        // A copy of the text with a thick white stroke for legibility.
-        text.append("svg:text")
-            .attr("x", 8)
+        // Abstraction labels
+        text.filter(function(d) {
+            return !filterKnowledge(d);
+        })
+            .append("svg:text")
+            .attr("x", AB_CIRCLE_R + 1)
             .attr("y", ".31em")
             .attr("class", "shadow")
             .text(function(d) {
                 return getNodeName(d);
             });
-
-        text.append("svg:text")
-            .attr("x", 8)
+        // A copy of the text with a thick white stroke for legibility.
+        text.filter(function(d) {
+            return !filterKnowledge(d);
+        })
+            .append("svg:text")
+            .attr("x", AB_CIRCLE_R + 1)
             .attr("y", ".31em")
+            .text(function(d) {
+                return getNodeName(d);
+            });
+
+        // Knowledge labels
+        text.filter(function(d) {
+            return filterKnowledge(d);
+        })
+            .append("svg:text")
+            .attr("x", 2)
+            .attr("y", KN_RECT_H / 2 + 2)
+            .attr("class", "shadow")
+            .text(function(d) {
+                return getNodeName(d);
+            });
+
+        text.filter(function(d) {
+            return filterKnowledge(d);
+        }).append("svg:text")
+            .attr("x", 2)
+            .attr("y", KN_RECT_H / 2 + 2)
             .text(function(d) {
                 return getNodeName(d);
             });
@@ -201,6 +233,11 @@ d3.json(json_path, function(json, error) {
 //     .attr("orient", "auto")
 //   .append("svg:path")
 //     .attr("d", "M0,-5L10,0L0,5");
+
+// returns nodes in the knowledge graph
+function filterKnowledge(d) {
+    return (d.name.indexOf("abstr_") === -1) && ((d.type === "sub-knowledge graph") || (d.type === "node") || (d.type === "root"));
+}
 
 function getNodeName(d) {
     if (d.label) return d.label;
