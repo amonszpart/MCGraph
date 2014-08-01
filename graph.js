@@ -1,64 +1,9 @@
-// http://blog.thomsonreuters.com/index.php/mobile-patent-suits-graphic-of-the-day/
-// var links = [
-//   {source: "Microsoft", target: "Amazon", type: "licensing"},
-//   {source: "Microsoft", target: "HTC", type: "licensing"},
-//   {source: "Samsung", target: "Apple", type: "suit"},
-//   {source: "Motorola", target: "Apple", type: "suit"},
-//   {source: "Nokia", target: "Apple", type: "resolved"},
-//   {source: "HTC", target: "Apple", type: "suit"},
-//   {source: "Kodak", target: "Apple", type: "suit"},
-//   {source: "Microsoft", target: "Barnes & Noble", type: "suit"},
-//   {source: "Microsoft", target: "Foxconn", type: "suit"},
-//   {source: "Oracle", target: "Google", type: "suit"},
-//   {source: "Apple", target: "HTC", type: "suit"},
-//   {source: "Microsoft", target: "Inventec", type: "suit"},
-//   {source: "Samsung", target: "Kodak", type: "resolved"},
-//   {source: "LG", target: "Kodak", type: "resolved"},
-//   {source: "RIM", target: "Kodak", type: "suit"},
-//   {source: "Sony", target: "LG", type: "suit"},
-//   {source: "Kodak", target: "LG", type: "resolved"},
-//   {source: "Apple", target: "Nokia", type: "resolved"},
-//   {source: "Qualcomm", target: "Nokia", type: "resolved"},
-//   {source: "Apple", target: "Motorola", type: "suit"},
-//   {source: "Microsoft", target: "Motorola", type: "suit"},
-//   {source: "Motorola", target: "Microsoft", type: "suit"},
-//   {source: "Huawei", target: "ZTE", type: "suit"},
-//   {source: "Ericsson", target: "ZTE", type: "suit"},
-//   {source: "Kodak", target: "Samsung", type: "resolved"},
-//   {source: "Apple", target: "Samsung", type: "suit"},
-//   {source: "Kodak", target: "RIM", type: "suit"},
-//   {source: "Nokia", target: "Qualcomm", type: "suit"}
-// ];
-
-// var nodes = {
-//   "Microsoft" : {"name":"Microsoft"},
-//   "Amazon":{"name":"Amazon"},
-//   "HTC":{"name":"HTC"},
-//   "Samsung":{"name":"Samsung"},
-//   "Apple":{"name":"Apple"},
-//   "Motorola":{"name":"Motorola"},
-//   "Nokia":{"name":"Nokia"},
-//   "Kodak":{"name":"Kodak"},
-//   "Barnes & Noble":{"name":"Barnes & Noble"},
-//   "Foxconn":{"name":"Foxconn"},
-//   "Oracle":{"name":"Oracle"},
-//   "Google":{"name":"Google"},
-//   "Inventec":{"name":"Inventec"},
-//   "LG":{"name":"LG"},
-//   "RIM":{"name":"RIM"},
-//   "Sony":{"name":"Sony"},
-//   "Qualcomm":{"name":"Qualcomm"},
-//   "Huawei":{"name":"Huawei"},
-//   "ZTE":{"name":"ZTE"},
-//   "Ericsson":{"name":"Ericsson"}
-// };
-
-// // Compute the distinct nodes from the links.
-//  links.forEach(function(link) {
-//    link.source = nodes[link.source] || (nodes[link.source] = {name: link.source});
-//    link.target = nodes[link.target] || (nodes[link.target] = {name: link.target});
-//  });
-//  console.log(links);
+// JSON CONVENTION: 
+//  nodes: name is the file-level unique id, displayed, if label missing
+//         label is the text displayed
+//         
+//  links: type is a category, not displayed
+//         label is the lable of the link displayed 
 
 // scene size
 var w = 1024,
@@ -75,7 +20,10 @@ var link = {},
 // create force graph, but don't start
 var force = d3.layout.force()
     .size([w, h])
-    .linkDistance(200)
+    .linkDistance(function(d) {
+        if (d.weight) return 200 / d.weight;
+        else return 20; // default weight = 10;
+    })
     .charge(-400)
     .on("tick", tick);
 
@@ -86,100 +34,127 @@ var svg = d3.select("body").append("svg:svg")
 
 // read data, and fill force graph
 d3.json(json_path, function(json, error) {
+    d3.json(abstraction_path, function(abstraction, error2) {
+        // merge two json files, by appending namespace "abstraction" to the second set
+        nodes_data = json.nodes;
+        abstraction.nodes.forEach(function(item) {
+            // store previous name as label
+            if (!item.label) item.label = item.name;
+            // append namespace to name (id) 
+            item.name = "abstr_" + item.name;
+            // store
+            nodes_data.push(item);
+        });
+        // nodes_data = json.nodes.concat(abstraction.nodes);
+        links_data = json.links;
+        abstraction.links.forEach(function(item) {
+            item.source = "abstr_" + item.source;
+            item.target = "abstr_" + item.target;
+            links_data.push(item);
+        });
+        //links_data = json.links.concat(abstraction.links);
 
-    // parse string link endpoints to node ids
-    var tmp_nodes = {}; // is a map<name,id>
-    json.nodes.forEach(function(item, index) {
-        // store node index under it's name in the map
-        tmp_nodes[item.name] = index;
-        if (item.x) item.x *= w;
-        if (item.y) item.y *= h;
-    });
-    // change link source and target fields to use these ids instead of string keys
-    json.links.forEach(function(item) {
-        // link = item;
-        item.source = tmp_nodes[item.source];
-        item.target = tmp_nodes[item.target];
-    });
+        //console.log("obj: " + obj);
+        // parse string link endpoints to node ids
+        var tmp_nodes = {}; // is a map<name,id>
+        nodes_data.forEach(function(item, index) {
+            // store node index under it's name in the map
+            tmp_nodes[item.name] = index;
+            if (item.x) item.x *= w;
+            if (item.y) item.y *= h;
+        });
+        // change link source and target fields to use these ids instead of string keys
+        links_data.forEach(function(item) {
+            // link = item;
+            item.source = tmp_nodes[item.source];
+            item.target = tmp_nodes[item.target];
+            if (!item.weight) item.weight = 10;
 
-    // add nodes to force graph
-    force.nodes(json.nodes)
-        .links(json.links)
-        .start();
+            console.log("item.weight: " + item.weight);
+        });
+        links_data.forEach(function(item, index, links_data) {
+            console.log("check[" + links_data[index].source + "-" + links_data[index].target + "]:" + item.weight);
+        });
 
-    // create link objects (svg groups) and add class .link to them
-    link = svg.append("svg:g").selectAll("g.link")
-        .data(force.links())
-        .enter().append('g')
-        .attr('class', 'link');
+        // add nodes to force graph
+        force.nodes(nodes_data)
+            .links(links_data)
+            .start();
 
-    // create link arches
-    linkPath = link.append("svg:path")
-        .attr("class", function(d) {
-            return "link " + d.type;
+        // create link objects (svg groups) and add class .link to them
+        link = svg.append("svg:g").selectAll("g.link")
+            .data(force.links())
+            .enter().append('g')
+            .attr('class', 'link');
+
+        // create link arches
+        linkPath = link.append("svg:path")
+            .attr("class", function(d) {
+                return "link " + d.type;
+            })
+            .attr("marker-end", function(d) {
+                return "url(#" + d.type + ")";
+            });
+
+        textPath = link.append("svg:path")
+            .attr("id", function(d) {
+                return d.source.index + "_" + d.target.index;
+            })
+            .attr("class", "textpath");
+
+        circle = svg.append("svg:g").selectAll("circle")
+            .data(force.nodes()).enter()
+            .append("svg:circle")
+            .attr("r", 8)
+            .call(force.drag);
+
+        circle.style("fill", function(d) {
+            if (d.color) return d.color;
+            else return "#FF0000";
         })
-        .attr("marker-end", function(d) {
-            return "url(#" + d.type + ")";
-        });
 
-    textPath = link.append("svg:path")
-        .attr("id", function(d) {
-            return d.source.index + "_" + d.target.index;
-        })
-        .attr("class", "textpath");
+        text = svg.append("svg:g").selectAll("g")
+            .data(force.nodes())
+            .enter().append("svg:g");
 
-    circle = svg.append("svg:g").selectAll("circle")
-        .data(force.nodes()).enter()
-        .append("svg:circle")
-        .attr("r", 8)
-        .call(force.drag);
+        // A copy of the text with a thick white stroke for legibility.
+        text.append("svg:text")
+            .attr("x", 8)
+            .attr("y", ".31em")
+            .attr("class", "shadow")
+            .text(function(d) {
+                return getNodeName(d);
+            });
 
-    circle.style("fill", function(d) {
-        if (d.color) return d.color;
-        else return "#FF0000";
-    })
+        text.append("svg:text")
+            .attr("x", 8)
+            .attr("y", ".31em")
+            .text(function(d) {
+                return getNodeName(d);
+            });
 
-    text = svg.append("svg:g").selectAll("g")
-        .data(force.nodes())
-        .enter().append("svg:g");
+        path_label = svg.append("svg:g").selectAll(".path_label")
+            .data(force.links())
+            .enter().append("svg:text")
+            .attr("class", "path_label")
+            .append("svg:textPath")
+            .attr("startOffset", "50%")
+            .attr("text-anchor", "middle")
+            .attr("xlink:href", function(d) {
+                return "#" + d.source.index + "_" + d.target.index;
+            })
+            .style("fill", "#000")
+            .style("font-family", "Arial")
+            .text(function(d) {
+                if (d.label) return d.label;
+                else return "";
+            });
 
-    // A copy of the text with a thick white stroke for legibility.
-    text.append("svg:text")
-        .attr("x", 8)
-        .attr("y", ".31em")
-        .attr("class", "shadow")
-        .text(function(d) {
-            return d.name;
-        });
-
-    text.append("svg:text")
-        .attr("x", 8)
-        .attr("y", ".31em")
-        .text(function(d) {
-            return d.name;
-        });
-
-    path_label = svg.append("svg:g").selectAll(".path_label")
-        .data(force.links())
-        .enter().append("svg:text")
-        .attr("class", "path_label")
-        .append("svg:textPath")
-        .attr("startOffset", "50%")
-        .attr("text-anchor", "middle")
-        .attr("xlink:href", function(d) {
-            return "#" + d.source.index + "_" + d.target.index;
-        })
-        .style("fill", "#000")
-        .style("font-family", "Arial")
-        .text(function(d) {
-            if (d.label) return d.label;
-            else return "";
-        });
-
-    // force.nodes( d3.values(nodes) )
-    //      .links( links )
-    //      .start();
-});
+        // force.nodes( d3.values(nodes) )
+        //      .links( links )
+        //      .start();
+    }); // second json file
+}); // first json file
 
 
 // Per-type markers, as they don't inherit styles.
@@ -195,6 +170,12 @@ d3.json(json_path, function(json, error) {
 //     .attr("orient", "auto")
 //   .append("svg:path")
 //     .attr("d", "M0,-5L10,0L0,5");
+
+function getNodeName(d) {
+    if (d.label) return d.label;
+    else return d.name;
+
+}
 
 function arcPath(leftHand, d) {
     var start = leftHand ? d.source : d.target,

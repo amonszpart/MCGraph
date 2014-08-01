@@ -70,15 +70,18 @@
     "links": [{
         "source": "Knowledge graph",
         "target": "3D Proxy",
-        "type": "member"
+        "type": "member",
+        "weight": 1
     }, {
         "source": "Knowledge graph",
         "target": "Support",
-        "type": "member"
+        "type": "member",
+        "weight": 1
     }, {
         "source": "Knowledge graph",
         "target": "Semantic",
-        "type": "member"
+        "type": "member",
+        "weight": 1
     }, {
         "source": "Support",
         "target": "Stand on",
