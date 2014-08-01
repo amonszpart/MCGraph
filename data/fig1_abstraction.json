@@ -1,0 +1,144 @@
+{
+    "nodes": [{
+        "name": "Floor",
+        "type": "node",
+        "color": "#858589",
+        "fixed": true,
+        "x": 0.5,
+        "y": 0.9
+    }, {
+        "name": "TV",
+        "type": "node",
+        "color": "#699261"
+    }, {
+        "name": "DVD0",
+        "type": "node",
+        "color": "#937bde"
+    }, {
+        "name": "DVD1",
+        "type": "node",
+        "color": "#de953a"
+    }, {
+        "name": "DVD1_Stand On_DVD0",
+        "label": " ",
+        "type": "relation",
+        "color": "#FFFFFF"
+    }, {
+        "name": "Drawer",
+        "type": "node",
+        "color": "#d589a1"
+    }, {
+        "name": "DVD0_Stand On_Drawer",
+        "label": " ",
+        "type": "relation",
+        "color": "#FFFFFF"
+    }, {
+        "name": "TV_Stand On_Drawer",
+        "label": " ",
+        "type": "relation",
+        "color": "#FFFFFF"
+    }, {
+        "name": "Drawer_Stand On_Floor",
+        "label": " ",
+        "type": "relation",
+        "color": "#FFFFFF"
+    }, {
+        "name": "Wall",
+        "type": "node",
+        "color": "#d1d1d6"
+    }, {
+        "name": "Wall_Touch_Floor",
+        "label": " ",
+        "type": "relation",
+        "color": "#FFFFFF"
+    }, {
+        "name": "Drawer_Touch_Wall",
+        "label": " ",
+        "type": "relation",
+        "color": "#FFFFFF"
+    }, {
+        "name": "Picture0",
+        "type": "node",
+        "color": "#c0c861"
+    }, {
+        "name": "Picture1",
+        "type": "node",
+        "color": "#5c98d3"
+    }, {
+        "name": "Picture0_Fixed on_Wall",
+        "label": " ",
+        "type": "relation",
+        "color": "#FFFFFF"
+    }, {
+        "name": "Picture1_Fixed on_Wall",
+        "label": " ",
+        "type": "relation",
+        "color": "#FFFFFF"
+    }],
+    "links": [{
+        "source": "DVD1",
+        "target": "DVD1_Stand On_DVD0",
+        "type": "relation"
+    }, {
+        "source": "DVD1_Stand On_DVD0",
+        "target": "DVD0",
+        "type": "relation"
+    }, {
+        "source": "DVD0",
+        "target": "DVD0_Stand On_Drawer",
+        "type": "relation"
+    }, {
+        "source": "DVD0_Stand On_Drawer",
+        "target": "Drawer",
+        "type": "relation"
+    }, {
+        "source": "TV",
+        "target": "TV_Stand On_Drawer",
+        "type": "relation"
+    }, {
+        "source": "TV_Stand On_Drawer",
+        "target": "Drawer",
+        "type": "relation"
+    }, {
+        "source": "Drawer",
+        "target": "Drawer_Stand On_Floor",
+        "type": "relation"
+    }, {
+        "source": "Drawer_Stand On_Floor",
+        "target": "Floor",
+        "type": "relation"
+    }, {
+        "source": "Drawer",
+        "target": "Drawer_Touch_Wall",
+        "type": "relation"
+    }, {
+        "source": "Drawer_Touch_Wall",
+        "target": "Wall",
+        "type": "relation"
+    }, {
+        "source": "Wall",
+        "target": "Wall_Touch_Floor",
+        "type": "relation"
+    }, {
+        "source": "Wall_Touch_Floor",
+        "target": "Floor",
+        "type": "relation"
+    }, {
+        "source": "Picture0",
+        "target": "Picture0_Fixed on_Wall",
+        "type": "relation"
+    }, {
+        "source": "Picture0_Fixed on_Wall",
+        "target": "Wall",
+        "type": "relation"
+    }, {
+        "source": "Picture1",
+        "target": "Picture1_Fixed on_Wall",
+        "type": "relation"
+    }, {
+        "source": "Picture1_Fixed on_Wall",
+        "target": "Wall",
+        "type": "relation"
+
+    }]
+}
