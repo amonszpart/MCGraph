@@ -69,11 +69,6 @@ d3.json(json_path, function(json, error) {
             item.source = tmp_nodes[item.source];
             item.target = tmp_nodes[item.target];
             if (!item.weight) item.weight = 10;
-
-            console.log("item.weight: " + item.weight);
-        });
-        links_data.forEach(function(item, index, links_data) {
-            console.log("check[" + links_data[index].source + "-" + links_data[index].target + "]:" + item.weight);
         });
 
         // add nodes to force graph
@@ -102,16 +97,52 @@ d3.json(json_path, function(json, error) {
             })
             .attr("class", "textpath");
 
+        // circle should be called "svg_nodes"
         circle = svg.append("svg:g").selectAll("circle")
             .data(force.nodes()).enter()
-            .append("svg:circle")
-            .attr("r", 8)
+            .append("svg:g")
+            .attr("class", "node")
             .call(force.drag);
 
-        circle.style("fill", function(d) {
-            if (d.color) return d.color;
-            else return "#FF0000";
-        })
+        // add RECT for all knowledge nodes
+        svg.selectAll("g.node")
+            .filter(function(d) {
+                return (d.name.indexOf("abstr_") === -1) && ((d.type === "sub-knowledge graph") || (d.type === "node") || (d.type === "root"));
+            })
+            .append("svg:rect")
+            .attr("width", 30)
+            .attr("height", 20)
+            .style("stroke", function(d) {
+                if (d.color) return d.color;
+                else return "#3c64a0";
+            })
+            .style("fill", function(d) {
+                return "#FFFFFF";
+            });
+
+        // add CIRCLE to abstraction NODEs
+        svg.selectAll("g.node").filter(function(d) {
+            return (d.name.indexOf("abstr_") > -1) && (d.type === "node");
+        }).append("svg:circle").attr("r", 8)
+            .style("fill", function(d) {
+                if (d.color) return d.color;
+                else return "#FF0000";
+            });
+
+        // add RECT to abstraction RELATIONs
+        svg.selectAll("g.node").filter(function(d) {
+            return (d.name.indexOf("abstr_") > -1) && (d.type === "relation");
+        }).append("svg:rect")
+            .attr("width", 16)
+            .attr("height", 16)
+            .attr("x", -8)
+            .attr("y", -8)
+            .style("stroke", function(d) {
+                return "#000000";
+            })
+            .style("fill", function(d) {
+                return "#FFFFFF";
+            });
 
         text = svg.append("svg:g").selectAll("g")
             .data(force.nodes())
