@@ -7,13 +7,22 @@
         "x": 0.5
     }, {
         "name": "3D Proxy",
-        "type": "sub-knowledge graph"
+        "type": "sub-knowledge graph",
+        "fixed": true,
+        "y": 0.2,
+        "x": 0.1
     }, {
         "name": "Support",
-        "type": "sub-knowledge graph"
+        "type": "sub-knowledge graph",
+        "fixed": true,
+        "y": 0.2,
+        "x": 0.5
     }, {
         "name": "Semantic",
-        "type": "sub-knowledge graph"
+        "type": "sub-knowledge graph",
+        "fixed": true,
+        "y": 0.2,
+        "x": 0.9
     }, {
         "name": "Stand on",
         "group": "Support",
@@ -55,7 +64,7 @@
         "group": "Semantic",
         "type": "node"
     }, {
-        "name": "TV bench",
+        "name": "Drawer",
         "group": "Semantic",
         "type": "node"
     }, {
@@ -124,7 +133,7 @@
         "type": "member"
     }, {
         "source": "Furniture",
-        "target": "TV bench",
+        "target": "Drawer",
         "type": "member"
     }, {
         "source": "Electronic",
@@ -134,5 +143,10 @@
         "source": "Electronic",
         "target": "Phone",
         "type": "member"
+    }, {
+        "source": "Plane",
+        "target": "Sphere",
+        "type": "sybling",
+        "visible": false
     }]
 }

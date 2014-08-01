@@ -21,15 +21,21 @@
           $abstraction_path = "data/" . $_GET["abstraction"];
         else
           $abstraction_path = "data/fig1_abstraction.json";
+
+        if ( isset($_GET["relation"]) )
+          $relation_path = "data/" . $_GET["relation"];
+        else
+          $relation_path = "data/fig1_relation.json";
     ?>
 
     <!-- Feedback graph json file used -->
-    <?php echo "Used graph json file (usage: .../index.php?graph=graph.json&abstraction=abstraction.json): <b>" . $json_path . "</b> and <b>" . $abstraction_path . "</b>, source location: <i>/home/amonszpa/www/public_html/MCGraph</i> <br>"; ?>
+    <?php echo "Used graph json file (usage: .../index.php?graph=graph.json&abstraction=abstraction.json&relation=relation.json): <b>" . $json_path . "</b> and <b>" . $abstraction_path . "</b>, source location: <i>/home/amonszpa/www/public_html/MCGraph</i> <br>"; ?>
 
     <!-- Create javascript variable for json_path -->
     <script type="text/javascript" charset="utf-8">
       var json_path = "<?php echo $json_path; ?>";
       var abstraction_path = "<?php echo $abstraction_path; ?>";
+      var relation_path = "<?php echo $relation_path; ?>";
     </script>
 
     <!-- Launch graph code (using json_path javascript variable as input) -->

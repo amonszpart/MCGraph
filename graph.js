@@ -38,184 +38,189 @@ var svg = d3.select("body").append("svg:svg")
 // read data, and fill force graph
 d3.json(json_path, function(json, error) {
     d3.json(abstraction_path, function(abstraction, error2) {
-        // merge two json files, by appending namespace "abstraction" to the second set
-        nodes_data = json.nodes;
-        abstraction.nodes.forEach(function(item) {
-            // store previous name as label
-            if (!item.label) item.label = item.name;
-            // append namespace to name (id) 
-            item.name = "abstr_" + item.name;
-            // store
-            nodes_data.push(item);
-        });
-        // nodes_data = json.nodes.concat(abstraction.nodes);
-        links_data = json.links;
-        abstraction.links.forEach(function(item) {
-            item.source = "abstr_" + item.source;
-            item.target = "abstr_" + item.target;
-            links_data.push(item);
-        });
-        //links_data = json.links.concat(abstraction.links);
+        d3.json(relation_path, function(relation, error3) {
+            // merge three json files, by appending namespace "abstraction" to the second set
+            nodes_data = json.nodes;
+            abstraction.nodes.forEach(function(item) {
+                // store previous name as label
+                if (!item.label) item.label = item.name;
+                // append namespace to name (id) 
+                item.name = "abstr_" + item.name;
+                // store
+                nodes_data.push(item);
+            });
+            // nodes_data = json.nodes.concat(abstraction.nodes);
+            links_data = json.links;
+            abstraction.links.forEach(function(item) {
+                item.source = "abstr_" + item.source;
+                item.target = "abstr_" + item.target;
+                links_data.push(item);
+            });
+            relation.links.forEach(function(item) {
+                if (!item.weight) item.weight = 0.8;
+                links_data.push(item);
+            });
+            //links_data = json.links.concat(abstraction.links);
 
-        //console.log("obj: " + obj);
-        // parse string link endpoints to node ids
-        var tmp_nodes = {}; // is a map<name,id>
-        nodes_data.forEach(function(item, index) {
-            // store node index under it's name in the map
-            tmp_nodes[item.name] = index;
-            if (item.x) item.x *= w;
-            if (item.y) item.y *= h;
-        });
-        // change link source and target fields to use these ids instead of string keys
-        links_data.forEach(function(item) {
-            // link = item;
-            item.source = tmp_nodes[item.source];
-            item.target = tmp_nodes[item.target];
-            if (!item.weight) item.weight = 10;
-        });
+            //console.log("obj: " + obj);
+            // parse string link endpoints to node ids
+            var tmp_nodes = {}; // is a map<name,id>
+            nodes_data.forEach(function(item, index) {
+                // store node index under it's name in the map
+                tmp_nodes[item.name] = index;
+                if (item.x) item.x *= w;
+                if (item.y) item.y *= h;
+            });
+            // change link source and target fields to use these ids instead of string keys
+            links_data.forEach(function(item) {
+                // link = item;
+                item.source = tmp_nodes[item.source];
+                item.target = tmp_nodes[item.target];
+                if (!item.weight) item.weight = 10;
+            });
 
-        // add nodes to force graph
-        force.nodes(nodes_data)
-            .links(links_data)
-            .start();
+            // add nodes to force graph
+            force.nodes(nodes_data)
+                .links(links_data)
+                .start();
 
-        // create link objects (svg groups) and add class .link to them
-        link = svg.append("svg:g").selectAll("g.link")
-            .data(force.links())
-            .enter().append('g')
-            .attr('class', 'link');
+            // create link objects (svg groups) and add class .link to them
+            link = svg.append("svg:g").selectAll("g.link")
+                .data(force.links())
+                .enter().append('g')
+                .attr('class', 'link');
 
-        // create link arches
-        linkPath = link.append("svg:path")
-            .attr("class", function(d) {
+            // create link arches
+            linkPath = link.append("svg:path");
+            linkPath.attr("class", function(d) {
                 return "link " + d.type;
             })
-            .attr("marker-end", function(d) {
-                return "url(#" + d.type + ")";
-            });
+                .attr("marker-end", function(d) {
+                    return "url(#" + d.type + ")";
+                });
 
-        textPath = link.append("svg:path")
-            .attr("id", function(d) {
-                return d.source.index + "_" + d.target.index;
+            textPath = link.append("svg:path")
+                .attr("id", function(d) {
+                    return d.source.index + "_" + d.target.index;
+                })
+                .attr("class", "textpath");
+
+            // circle should be called "svg_nodes"
+            circle = svg.append("svg:g").selectAll("circle")
+                .data(force.nodes()).enter()
+                .append("svg:g")
+                .attr("class", "node")
+                .call(force.drag);
+
+            // add RECT for all knowledge nodes
+            svg.selectAll("g.node")
+                .filter(function(d) {
+                    return filterKnowledge(d);
+                })
+                .append("svg:rect")
+                .attr("width", KN_RECT_W)
+                .attr("height", KN_RECT_H)
+                .attr("x", -KN_RECT_W / 2)
+                .attr("y", -KN_RECT_H / 2)
+                .style("stroke", function(d) {
+                    if (d.color) return d.color;
+                    else return "#3c64a0";
+                })
+                .style("fill", function(d) {
+                    return "#FFFFFF";
+                });
+
+            // add CIRCLE to abstraction NODEs
+            svg.selectAll("g.node").filter(function(d) {
+                return (d.name.indexOf("abstr_") > -1) && (d.type === "node");
+            }).append("svg:circle")
+                .attr("r", AB_CIRCLE_R)
+                .style("fill", function(d) {
+                    if (d.color) return d.color;
+                    else return "#FF0000";
+                });
+
+            // add RECT to abstraction RELATIONs
+            svg.selectAll("g.node").filter(function(d) {
+                return (d.name.indexOf("abstr_") > -1) && (d.type === "relation");
+            }).append("svg:rect")
+                .attr("width", 16)
+                .attr("height", 16)
+                .attr("x", -8)
+                .attr("y", -8)
+                .style("stroke", function(d) {
+                    return "#000000";
+                })
+                .style("fill", function(d) {
+                    return "#FFFFFF";
+                });
+
+            // general text placeholders
+            text = svg.append("svg:g").selectAll("g")
+                .data(force.nodes())
+                .enter().append("svg:g");
+
+            // Abstraction labels
+            text.filter(function(d) {
+                return !filterKnowledge(d);
             })
-            .attr("class", "textpath");
+                .append("svg:text")
+                .attr("x", AB_CIRCLE_R + 1)
+                .attr("y", ".31em")
+                .attr("class", "shadow")
+                .text(function(d) {
+                    return getNodeName(d);
+                });
+            // A copy of the text with a thick white stroke for legibility.
+            text.filter(function(d) {
+                return !filterKnowledge(d);
+            })
+                .append("svg:text")
+                .attr("x", AB_CIRCLE_R + 1)
+                .attr("y", ".31em")
+                .text(function(d) {
+                    return getNodeName(d);
+                });
 
-        // circle should be called "svg_nodes"
-        circle = svg.append("svg:g").selectAll("circle")
-            .data(force.nodes()).enter()
-            .append("svg:g")
-            .attr("class", "node")
-            .call(force.drag);
-
-        // add RECT for all knowledge nodes
-        svg.selectAll("g.node")
-            .filter(function(d) {
+            // Knowledge labels
+            text.filter(function(d) {
                 return filterKnowledge(d);
             })
-            .append("svg:rect")
-            .attr("width", KN_RECT_W)
-            .attr("height", KN_RECT_H)
-            .style("stroke", function(d) {
-                if (d.color) return d.color;
-                else return "#3c64a0";
-            })
-            .style("fill", function(d) {
-                return "#FFFFFF";
-            });
+                .append("svg:text")
+                .attr("x", -KN_RECT_W / 2 + 1)
+                .attr("y", 2)
+                .attr("class", "shadow")
+                .text(function(d) {
+                    return getNodeName(d);
+                });
 
-        // add CIRCLE to abstraction NODEs
-        svg.selectAll("g.node").filter(function(d) {
-            return (d.name.indexOf("abstr_") > -1) && (d.type === "node");
-        }).append("svg:circle")
-            .attr("r", AB_CIRCLE_R)
-            .style("fill", function(d) {
-                if (d.color) return d.color;
-                else return "#FF0000";
-            });
+            text.filter(function(d) {
+                return filterKnowledge(d);
+            }).append("svg:text")
+                .attr("x", -KN_RECT_W / 2 + 1)
+                .attr("y", 2)
+                .text(function(d) {
+                    return getNodeName(d);
+                });
 
-        // add RECT to abstraction RELATIONs
-        svg.selectAll("g.node").filter(function(d) {
-            return (d.name.indexOf("abstr_") > -1) && (d.type === "relation");
-        }).append("svg:rect")
-            .attr("width", 16)
-            .attr("height", 16)
-            .attr("x", -8)
-            .attr("y", -8)
-            .style("stroke", function(d) {
-                return "#000000";
-            })
-            .style("fill", function(d) {
-                return "#FFFFFF";
-            });
+            path_label = svg.append("svg:g").selectAll(".path_label")
+                .data(force.links())
+                .enter().append("svg:text");
 
-        // general text placeholders
-        text = svg.append("svg:g").selectAll("g")
-            .data(force.nodes())
-            .enter().append("svg:g");
-
-        // Abstraction labels
-        text.filter(function(d) {
-            return !filterKnowledge(d);
-        })
-            .append("svg:text")
-            .attr("x", AB_CIRCLE_R + 1)
-            .attr("y", ".31em")
-            .attr("class", "shadow")
-            .text(function(d) {
-                return getNodeName(d);
-            });
-        // A copy of the text with a thick white stroke for legibility.
-        text.filter(function(d) {
-            return !filterKnowledge(d);
-        })
-            .append("svg:text")
-            .attr("x", AB_CIRCLE_R + 1)
-            .attr("y", ".31em")
-            .text(function(d) {
-                return getNodeName(d);
-            });
-
-        // Knowledge labels
-        text.filter(function(d) {
-            return filterKnowledge(d);
-        })
-            .append("svg:text")
-            .attr("x", 2)
-            .attr("y", KN_RECT_H / 2 + 2)
-            .attr("class", "shadow")
-            .text(function(d) {
-                return getNodeName(d);
-            });
-
-        text.filter(function(d) {
-            return filterKnowledge(d);
-        }).append("svg:text")
-            .attr("x", 2)
-            .attr("y", KN_RECT_H / 2 + 2)
-            .text(function(d) {
-                return getNodeName(d);
-            });
-
-        path_label = svg.append("svg:g").selectAll(".path_label")
-            .data(force.links())
-            .enter().append("svg:text")
-            .attr("class", "path_label")
-            .append("svg:textPath")
-            .attr("startOffset", "50%")
-            .attr("text-anchor", "middle")
-            .attr("xlink:href", function(d) {
-                return "#" + d.source.index + "_" + d.target.index;
-            })
-            .style("fill", "#000")
-            .style("font-family", "Arial")
-            .text(function(d) {
-                if (d.label) return d.label;
-                else return "";
-            });
-
-        // force.nodes( d3.values(nodes) )
-        //      .links( links )
-        //      .start();
+            path_label.attr("class", "path_label")
+                .append("svg:textPath")
+                .attr("startOffset", "50%")
+                .attr("text-anchor", "middle")
+                .attr("xlink:href", function(d) {
+                    return "#" + d.source.index + "_" + d.target.index;
+                })
+                .style("fill", "#000")
+                .style("font-family", "Arial")
+                .text(function(d) {
+                    if (d.label) return d.label;
+                    else return "";
+                });
+        }); // third  json file
     }); // second json file
 }); // first json file
 
