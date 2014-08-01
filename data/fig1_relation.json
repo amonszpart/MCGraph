@@ -1,0 +1,47 @@
+{
+    "nodes": [],
+    "links": [{
+        "source": "Stand on",
+        "target": "abstr_DVD1_Stand On_DVD0",
+        "type": "Support"
+    }, {
+        "source": "Stand on",
+        "target": "abstr_DVD0_Stand On_Drawer",
+        "type": "Support"
+    }, {
+        "source": "Touch",
+        "target": "abstr_Drawer_Touch_Wall",
+        "type": "Support"
+    }, {
+        "source": "Fixed on",
+        "target": "abstr_Picture0_Fixed on_Wall",
+        "type": "Support"
+    }, {
+        "source": "Cuboid",
+        "target": "abstr_DVD0",
+        "type": "3D Proxy"
+    }, {
+        "source": "Cuboid",
+        "target": "abstr_DVD1",
+        "type": "3D Proxy"
+    }, {
+        "source": "Decoration",
+        "target": "abstr_Picture0",
+        "type": "Semantic"
+    }, {
+        "source": "Decoration",
+        "target": "abstr_Picture1",
+        "type": "Semantic"
+    }, {
+        "source": "Electronic",
+        "target": "abstr_DVD1",
+        "type": "Semantic",
+        "weight": 0.2
+    }, {
+        "source": "Drawer",
+        "target": "abstr_Drawer",
+        "type": "Semantic",
+        "wegith": 0.4
+
+    }]
+}
