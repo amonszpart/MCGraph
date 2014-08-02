@@ -1,0 +1,42 @@
+S:KG
+Knowledge graph
+  3D Proxy
+    Plane
+    Cuboid
+    Sphere
+  Support
+    Touch
+    Fixed on
+    Stand on
+  Semantic
+    Furniture
+      Drawer
+      Sofa
+    Decoration
+    Electronic
+      TV
+      Phone
+S:AG
+TV
+DVD0
+DVD1
+Drawer
+Wall
+Floor
+Picture0
+Picture1
+S:RS
+DVD1:DVD0:Stand on
+DVD0:Drawer:Stand on
+TV:Drawer:Stand on
+Drawer:Floor:Stand on
+Wall:Floor:Touch
+Drawer:Wall:Touch
+Picture0:Wall:Fixed on
+Picture1:Wall:Fixed on
+Picture0:Decoration
+Picture1:Decoration
+Drawer:Drawer
+DVD1:Electronic
+DVD0:Electronic
+TV:TV
