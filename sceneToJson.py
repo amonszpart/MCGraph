@@ -75,7 +75,7 @@ RSdata = [x.strip() for x in parts["S:RS\n"]]
 
 # create KG json
 KGnodes = []
-KGnodes.append({"name": "Knowledge graph", "type": "root"})
+KGnodes.append({"name": "Knowledge graph", "type": "root", "fixed": true, "y": 0.1, "x": 0.5})
 for key, value in KGdata['Knowledge graph'].iteritems():
   KGnodes.append({"name": key, "type": "sub-knowledge graph"})
 
